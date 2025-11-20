@@ -35,7 +35,7 @@ def main():
                         .format(len(endpoint), endpoint).encode())
 
         else:
-        conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n") # wait for client
+            conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n") # wait for client
 
 
 if __name__ == "__main__":
