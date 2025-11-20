@@ -11,7 +11,12 @@ def main():
     print("Server is running on port 4221")
 
     conn, addr = server_socket.accept() # wait for client
-    conn.sendall(b"HTTP/1.1 200 OK\r\n\r\nHello, World!") # wait for client
+    data = conn.recv(1024).decode()
+    print(data)
+    if data.startswith("GET / HTTP/1.1"):
+        conn.sendall(b"HTTP/1.1 200 OK\r\n\r\nHello, World!") # wait for client
+    else:
+        conn.sendall(b"HTTP/1.1 404 NOT FOUND\r\n\r\n") # wait for client
 
 
 if __name__ == "__main__":
