@@ -30,7 +30,7 @@ def main():
 
         conn.sendall("HTTP/1.1 200 OK\r\n"
                     "Content-Type: text/plain\r\n"
-                    "Content-Length: {}\r\n\r\n {}"
+                    "Content-Length: {}\r\n\r\n{}"
                     .format(len(endpoint), endpoint).encode())
 
     else:
