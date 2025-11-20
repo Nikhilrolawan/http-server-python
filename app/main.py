@@ -16,7 +16,7 @@ def main():
     if data.startswith("GET / HTTP/1.1"):
         conn.sendall(b"HTTP/1.1 200 OK\r\n\r\nHello, World!") # wait for client
     else:
-        conn.sendall(b"HTTP/1.1 404 NOT FOUND\r\n\r\n") # wait for client
+        conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n") # wait for client
 
 
 if __name__ == "__main__":
