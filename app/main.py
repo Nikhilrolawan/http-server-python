@@ -15,6 +15,12 @@ def main():
     print(data)
     if data.startswith("GET / HTTP/1.1"):
         conn.sendall(b"HTTP/1.1 200 OK\r\n\r\nHello, World!") # wait for client
+    elif data.startswith(f"GET /echo/"):
+        endpoint = data.split('/')[2][:3]
+        conn.sendall("HTTP/1.1 200 OK\r\n"
+                    "Content-Type: text/plain\r\n"
+                    "Content-Length: {}\r\n\r\n{}"
+                     .format(len(endpoint), endpoint).encode())
     else:
         conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n") # wait for client
 
