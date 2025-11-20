@@ -16,7 +16,7 @@ def main():
     if data.startswith("GET / HTTP/1.1"):
         conn.sendall(b"HTTP/1.1 200 OK\r\n\r\nHello, World!") # wait for client
     elif data.startswith(f"GET /echo/"):
-        endpoint = data.split('/')[2][:3]
+        endpoint = data.split('/')[2][:-5]
         conn.sendall("HTTP/1.1 200 OK\r\n"
                     "Content-Type: text/plain\r\n"
                     "Content-Length: {}\r\n\r\n{}"
