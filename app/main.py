@@ -1,19 +1,22 @@
 import socket  # noqa: F401
 import threading
+import os
 
 
-def handle_response(conn, data):
-    
-    if data.startswith("GET / HTTP/1.1"):
+def handle_response(conn, request):
+
+    if request.startswith("GET / HTTP/1.1"):
         conn.sendall(b"HTTP/1.1 200 OK\r\n\r\nHello, World!") # wait for client
-    elif data.startswith("GET /echo/"):
-        endpoint = data.split('/')[2][:-5]
+
+    elif request.startswith("GET /echo/"):
+        endpoint = request.split('/')[2][:-5]
         conn.sendall("HTTP/1.1 200 OK\r\n"
                     "Content-Type: text/plain\r\n"
                     "Content-Length: {}\r\n\r\n{}"
                     .format(len(endpoint), endpoint).encode())
-    elif data.startswith("GET /user-agent"):
-        headers = data.split("\r\n")
+        
+    elif request.startswith("GET /user-agent"):
+        headers = request.split("\r\n")
         endpoint = ''
         for h in headers:
             if h.startswith("User-Agent:"):
@@ -23,13 +26,26 @@ def handle_response(conn, data):
                     "Content-Type: text/plain\r\n"
                     "Content-Length: {}\r\n\r\n{}"
                     .format(len(endpoint), endpoint).encode())
+        
+    elif request.startswith("GET /files"):
+        path = request.split()[1]
+        content = ''
+        if os.path.exists(path):
+            with open(path, 'r') as f:
+                content = f.read()
+            conn.sendall("HTTP/1.1 200 OK\r\n"
+                        "Content-Type: application/octet-stream\r\n"
+                        "Content-Length: {}\r\n\r\n{}"
+                        .format(os.path.getsize(path), content).encode())
+        else:
+            conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n") # wait for client
 
     else:
         conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n") # wait for client
 
 def handle_request(conn):
-    data = conn.recv(1024).decode()
-    handle_response(conn, data)
+    request = conn.recv(1024).decode()
+    handle_response(conn, request)
     conn.close()
 
 def main():
