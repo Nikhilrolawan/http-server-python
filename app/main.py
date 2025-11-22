@@ -44,7 +44,7 @@ def handle_response(conn, request):
         if len(sys.argv) > 2 and sys.argv[1] == "--directory":
             directory = sys.argv[2]
         path = os.path.join(directory, request.split()[1][len('/files/'):])
-        content = request.split()[-1]
+        content = request.split("\r\n\r\n")[-1]
         try:
             with open(path, 'w') as fw:
                 fw.write(content)
