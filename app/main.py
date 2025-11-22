@@ -1,6 +1,7 @@
 import socket  # noqa: F401
 import threading
 import os
+import sys
 
 
 def handle_response(conn, request):
@@ -28,7 +29,10 @@ def handle_response(conn, request):
                     .format(len(endpoint), endpoint).encode())
         
     elif request.startswith("GET /files"):
-        path = request.split()[1]
+        directory = ""
+        if len(sys.argv) > 2 and sys.argv[1] == "--directory":
+            directory = sys.argv[2]
+        path = os.path.join(directory, request.split()[1][len('/files/'):])
         content = ''
         if os.path.exists(path):
             with open(path, 'r') as f:
@@ -36,7 +40,7 @@ def handle_response(conn, request):
             conn.sendall("HTTP/1.1 200 OK\r\n"
                         "Content-Type: application/octet-stream\r\n"
                         "Content-Length: {}\r\n\r\n{}"
-                        .format(os.path.getsize(path), content).encode())
+                        .format(os.path.getsize(path), str(content)).encode())
         else:
             conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n") # wait for client
 
@@ -49,16 +53,14 @@ def handle_request(conn):
     conn.close()
 
 def main():
-    # You can use print statements as follows for debugging, they'll be visible when running tests.
-    print("Logs from your program will appear here!")
-
-    # TODO: Uncomment the code below to pass the first stage
+    
+    print("Logs of program will appear here!")
     
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
     print("Server is running on port 4221")
     while True:
         server_socket.listen()
-        conn, addr = server_socket.accept() # wait for client
+        conn, addr = server_socket.accept() 
         threading.Thread(target=handle_request, args=(conn,)).start()
 
 
