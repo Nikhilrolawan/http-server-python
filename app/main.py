@@ -3,6 +3,11 @@ import threading
 import os
 import sys
 
+def send_response(conn, contentSize, content, contentType = "text/plain"):
+    return conn.sendall("HTTP/1.1 200 OK\r\n"
+                    "Content-Type: {}\r\n"
+                    "Content-Length: {}\r\n\r\n{}"
+                    .format(contentType,contentSize, content).encode())
 
 def handle_response(conn, request):
 
@@ -11,10 +16,7 @@ def handle_response(conn, request):
 
     elif request.startswith("GET /echo/"):
         endpoint = request.split('/')[2][:-5]
-        conn.sendall("HTTP/1.1 200 OK\r\n"
-                    "Content-Type: text/plain\r\n"
-                    "Content-Length: {}\r\n\r\n{}"
-                    .format(len(endpoint), endpoint).encode())
+        send_response(conn = conn, contentSize = len(endpoint), content = endpoint)
         
     elif request.startswith("GET /user-agent"):
         headers = request.split("\r\n")
@@ -22,11 +24,7 @@ def handle_response(conn, request):
         for h in headers:
             if h.startswith("User-Agent:"):
                 endpoint = h[len("User-Agent:"):].strip()
-
-        conn.sendall("HTTP/1.1 200 OK\r\n"
-                    "Content-Type: text/plain\r\n"
-                    "Content-Length: {}\r\n\r\n{}"
-                    .format(len(endpoint), endpoint).encode())
+        send_response(conn = conn, contentSize = len(endpoint), content = endpoint)
         
     elif request.startswith("GET /files"):
         directory = ""
@@ -37,10 +35,7 @@ def handle_response(conn, request):
         if os.path.exists(path):
             with open(path, 'r') as f:
                 content = f.read()
-            conn.sendall("HTTP/1.1 200 OK\r\n"
-                        "Content-Type: application/octet-stream\r\n"
-                        "Content-Length: {}\r\n\r\n{}"
-                        .format(os.path.getsize(path), str(content)).encode())
+            send_response(conn = conn, contentType = "application/octet-stream", contentSize = os.path.getsize(path), content = str(content))
         else:
             conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n") # wait for client
 
