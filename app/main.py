@@ -31,7 +31,7 @@ def handle_response(conn, request):
         if len(sys.argv) > 2 and sys.argv[1] == "--directory":
             directory = sys.argv[2]
         path = os.path.join(directory, request.split()[1][len('/files/'):])
-        content = ''
+        content = ""
         if os.path.exists(path):
             with open(path, 'r') as f:
                 content = f.read()
@@ -45,11 +45,11 @@ def handle_response(conn, request):
             directory = sys.argv[2]
         path = os.path.join(directory, request.split()[1][len('/files/'):])
         content = request.split()[-1]
-        if os.path.exists(path):
+        try:
             with open(path, 'w') as fw:
                 fw.write(content)
             conn.sendall(b"HTTP/1.1 201 Created\r\n\r\n") # wait for client
-        else:
+        except:
             conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n") # wait for client
 
     else:
