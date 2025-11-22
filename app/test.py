@@ -7,7 +7,9 @@
 #     if h.startswith("User-Agent:"):
 #         value = h[len("User-Agent:"):].strip()
 #         print(value)
-s = "GET /files/foo.txt HTTP/1.1\r\nHost: localhost:4221\r\nUser-Agent: curl/8.2.1\r\nAccept: */*\r\nAccept-Encoding: gzip, deflate\r\nConnection: keep-alive\r\n\r\n"
-print(s.split()[1][len('/files/'):])
+# s = "GET /files/foo.txt HTTP/1.1\r\nHost: localhost:4221\r\nUser-Agent: curl/8.2.1\r\nAccept: */*\r\nAccept-Encoding: gzip, deflate\r\nConnection: keep-alive\r\n\r\n"
+# print(s.split()[1][len('/files/'):])
 # import sys
 # print(sys.argv[0])
+s =  "POST /files/number HTTP/1.1\r\nHost: localhost:4221\r\nUser-Agent: curl/7.64.1\r\nAccept: */*\r\nContent-Type: application/octet-stream\r\nContent-Length: 5\r\n\r\n12345"
+print(type(s.split()[-1]))
