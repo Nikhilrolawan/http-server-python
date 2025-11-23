@@ -15,11 +15,15 @@ def handle_response(conn, request):
         conn.sendall(b"HTTP/1.1 200 OK\r\n\r\nHello, World!") # wait for client
 
     elif request.startswith("GET /echo/"):
-        endpoint1 = request.split('/')[2][:-5]
-        endpoint2 = request.split("\r\n")[4][len('Accept-Encoding: '):]
+        endpoint1 = request.split('/')[2][:-5].strip()
+        header = request.split("\r\n")
+        endpoint2 = ''
+        for h in header:
+            if h.lower().startswith("accept-encoding"):
+                endpoint2 = h.split(':')[1].strip()
         if endpoint2 == 'gzip':
             conn.sendall("HTTP/1.1 200 OK\r\n"
-                    "Content-Encoding: {}}"
+                    "Content-Encoding: {}\r\n"
                     "Content-Type: {}\r\n"
                     "Content-Length: {}\r\n\r\n{}"
                     .format(endpoint2, 'text/plain', len(endpoint1), endpoint1).encode())
