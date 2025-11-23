@@ -2,6 +2,7 @@ import socket  # noqa: F401
 import threading
 import os
 import sys
+import string
 
 def send_response(conn, contentSize, content, contentType = "text/plain"):
     return conn.sendall("HTTP/1.1 200 OK\r\n"
@@ -20,13 +21,13 @@ def handle_response(conn, request):
         endpoint2 = ''
         for h in header:
             if h.lower().startswith("accept-encoding"):
-                endpoint2 = h.split(':')[1].strip()
-        if endpoint2 == 'gzip':
+                endpoint2 = "".join(char for char in h if char not in string.punctuation).split()[1:]
+        if 'gzip' in endpoint2:
             conn.sendall("HTTP/1.1 200 OK\r\n"
                     "Content-Encoding: {}\r\n"
                     "Content-Type: {}\r\n"
                     "Content-Length: {}\r\n\r\n{}"
-                    .format(endpoint2, 'text/plain', len(endpoint1), endpoint1).encode())
+                    .format('gzip', 'text/plain', len(endpoint1), endpoint1).encode())
         else:
             send_response(conn = conn, contentSize = len(endpoint1), content = endpoint1)
         
