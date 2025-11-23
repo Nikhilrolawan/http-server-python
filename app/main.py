@@ -15,8 +15,16 @@ def handle_response(conn, request):
         conn.sendall(b"HTTP/1.1 200 OK\r\n\r\nHello, World!") # wait for client
 
     elif request.startswith("GET /echo/"):
-        endpoint = request.split('/')[2][:-5]
-        send_response(conn = conn, contentSize = len(endpoint), content = endpoint)
+        endpoint1 = request.split('/')[2][:-5]
+        endpoint2 = request.split("\r\n")[4][len('Accept-Encoding: '):]
+        if endpoint2 == 'gzip':
+            conn.sendall("HTTP/1.1 200 OK\r\n"
+                    "Content-Encoding: {}}"
+                    "Content-Type: {}\r\n"
+                    "Content-Length: {}\r\n\r\n{}"
+                    .format(endpoint2, 'text/plain', len(endpoint1), endpoint1).encode())
+        else:
+            send_response(conn = conn, contentSize = len(endpoint1), content = endpoint1)
         
     elif request.startswith("GET /user-agent"):
         headers = request.split("\r\n")
@@ -44,7 +52,7 @@ def handle_response(conn, request):
         if len(sys.argv) > 2 and sys.argv[1] == "--directory":
             directory = sys.argv[2]
         path = os.path.join(directory, request.split()[1][len('/files/'):])
-        content = request.split("\r\n\r\n")[-1]
+        content = request.split("\r\n\r\n")[-1] # request.body
         try:
             with open(path, 'w') as fw:
                 fw.write(content)
